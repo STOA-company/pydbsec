@@ -54,6 +54,7 @@ mcp = [
 ]
 docs = [
     "mkdocs-material>=9.5",
+    "pymdown-extensions>=10.0",
 ]
 
 [project.scripts]
@@ -65,6 +66,7 @@ Homepage = "https://github.com/Jaeminyx-Stoa/pydbsec"
 Documentation = "https://jaeminyx-stoa.github.io/pydbsec"
 Repository = "https://github.com/Jaeminyx-Stoa/pydbsec"
 Issues = "https://github.com/Jaeminyx-Stoa/pydbsec/issues"
+Changelog = "https://github.com/Jaeminyx-Stoa/pydbsec/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pydbsec"]

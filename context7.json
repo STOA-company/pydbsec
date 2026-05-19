@@ -2,7 +2,7 @@
   "$schema": "https://context7.com/schema/context7.json",
   "projectTitle": "pydbsec",
   "description": "Python wrapper for DB Securities (DB증권) OpenAPI — Stock trading, balance, quotes, charts for Korean & US markets",
-  "folders": ["src", "docs", "examples"],
+  "folders": ["src/pydbsec", "docs", "examples"],
   "excludeFolders": [".git", "__pycache__", "dist", "build", ".mypy_cache", ".pytest_cache"],
   "excludeFiles": [],
   "rules": [
