@@ -1,0 +1,15 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "pydbsec",
+  "description": "Python wrapper for DB Securities (DB증권) OpenAPI — Stock trading, balance, quotes, charts for Korean & US markets",
+  "folders": ["src", "docs", "examples"],
+  "excludeFolders": [".git", "__pycache__", "dist", "build", ".mypy_cache", ".pytest_cache"],
+  "excludeFiles": [],
+  "rules": [
+    "All DB Securities API calls use POST method",
+    "Use context manager (with/async with) for automatic cleanup",
+    "Pagination is handled via cont_yn/cont_key headers — the library merges pages automatically",
+    "All API responses include a .raw field for accessing the original response data",
+    "Token refresh is automatic when IGW00121 error code is received"
+  ]
+}
