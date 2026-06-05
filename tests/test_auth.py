@@ -63,21 +63,34 @@ class TestTokenManager:
         assert tm.token_type == "Bearer"
         assert tm.expires_at is not None
 
-    def test_token_request_failure(self, httpx_mock, monkeypatch):
-        # Patch retry wait to speed up test
-        monkeypatch.setattr("pydbsec.auth._RETRY_WAIT_SECONDS", 0)
-        # Register 3 responses (one per retry attempt)
-        for _ in range(3):
-            httpx_mock.add_response(
-                url="https://openapi.dbsec.co.kr:8443/oauth2/token",
-                method="POST",
-                status_code=401,
-                json={"error": "invalid_client", "error_description": "Invalid appkey"},
-            )
+    def test_token_request_failure_4xx_no_retry(self, httpx_mock):
+        # 4xx(인증 오류)는 재시도하지 않고 즉시 실패한다 — 단일 응답만 등록(소비 검증).
+        httpx_mock.add_response(
+            url="https://openapi.dbsec.co.kr:8443/oauth2/token",
+            method="POST",
+            status_code=401,
+            json={"error": "invalid_client", "error_description": "Invalid appkey"},
+        )
         tm = TokenManager("bad_key", "bad_secret")
         with pytest.raises(TokenError) as exc_info:
             _ = tm.token
         assert exc_info.value.status_code == 401
+        assert len(httpx_mock.get_requests()) == 1  # 재시도 없음
+
+    def test_token_request_retries_on_5xx(self, httpx_mock, monkeypatch):
+        # 5xx(일시적)는 재시도한다 — 3회 모두 실패하면 TokenError.
+        monkeypatch.setattr("pydbsec.auth._RETRY_WAIT_SECONDS", 0)
+        for _ in range(3):
+            httpx_mock.add_response(
+                url="https://openapi.dbsec.co.kr:8443/oauth2/token",
+                method="POST",
+                status_code=503,
+                json={"error": "service_unavailable"},
+            )
+        tm = TokenManager("k", "s")
+        with pytest.raises(TokenError):
+            _ = tm.token
+        assert len(httpx_mock.get_requests()) == 3  # 3회 재시도
 
     def test_revoke_token(self, httpx_mock):
         httpx_mock.add_response(

@@ -105,6 +105,14 @@ class TokenManager:
                     e.response.status_code,
                     body,
                 )
+                if 400 <= e.response.status_code < 500:
+                    # 인증/요청 오류(4xx, 예: 잘못된 AppKey)는 재시도해도 동일하므로 즉시 전파.
+                    # (재시도는 네트워크/5xx 같은 일시적 오류에만 의미가 있다)
+                    raise TokenError(
+                        "Token request rejected by DB Securities",
+                        status_code=e.response.status_code,
+                        response_body=body,
+                    ) from e
             except httpx.HTTPError as e:
                 last_error = e
                 logger.warning("Token request failed (attempt %d): %s", attempt, e)
